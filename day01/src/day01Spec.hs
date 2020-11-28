@@ -3,10 +3,10 @@ import Test.Tasty.Hspec
 
 main :: IO ()
 main = do
-    tSpec <- testSpec "spec" spec
+    tSpec <- testSpec "day1" spec
     defaultMain (testGroup "Tests" [tSpec])
 
-spec = context "day1" $ do
+spec = context "spec" $ do
     it "passes simple test" $
         True == True
 
