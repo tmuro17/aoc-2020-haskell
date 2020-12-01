@@ -7,15 +7,29 @@ import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 import qualified Control.Applicative as CA
 
+import Test.Tasty
+import Test.Tasty.Hspec
+
 import Control.Monad (guard)
 
 main :: IO ()
 main = do
-        text <- TIO.readFile "data/input1.txt"
-        let inputTxt = successfulParse text
-        print $ head $ solve1a inputTxt
-        print $ head $ solve1b inputTxt
+    spc <- spec
+    tSpec <- testSpec "day1" spc
+    defaultMain (testGroup "Tests" [tSpec])
 
+spec :: IO (SpecWith ())
+spec = do
+    text <- TIO.readFile "data/input1.txt"
+    let inputTxt = successfulParse text
+    return $ context "spec" $ do
+        describe "overall" $ do
+            it "passes example" $
+                (head $ solve1a [1721,979,366,299,675,1456]) `shouldBe` 514579
+            it "passes 1a" $
+                (head $ solve1a inputTxt) `shouldBe` 471019
+            it "passes 1b" $
+                (head $ solve1b inputTxt) `shouldBe` 103927824
 -- Parse the input file
 type Parser = Parsec Void Text
 
