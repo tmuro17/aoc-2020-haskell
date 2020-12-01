@@ -62,7 +62,7 @@ executables:
 tests:
   testDay01:
       main: day01Spec.hs
-      source-dirs: src
+      source-dirs: test
       ghc-options:
         - -threaded
         - -rtsopts

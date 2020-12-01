@@ -8,5 +8,5 @@ main = do
 
 spec = context "spec" $ do
     it "passes simple test" $
-        True == True
+        returnTrue == True
 
