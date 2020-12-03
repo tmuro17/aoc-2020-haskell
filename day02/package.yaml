@@ -57,3 +57,5 @@ executables:
       - text
       - megaparsec
       - containers
+      - tasty
+      - tasty-hspec

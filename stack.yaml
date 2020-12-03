@@ -7,3 +7,4 @@ ghc-options:
 packages:
   - day01
   - day02
+  - day03
