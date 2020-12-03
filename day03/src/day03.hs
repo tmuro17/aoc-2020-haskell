@@ -50,6 +50,7 @@ treesOnSlope (right, down) trees lst | hitTree lst = treesOnSlope (right, down) 
 
 hitTree :: [String] -> Bool
 hitTree [] = False
+hitTree [[]] = False
 hitTree lst = (=='#') $ head $ head lst
 
 downList :: Integer -> [String] -> [String]
