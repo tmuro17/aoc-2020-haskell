@@ -1,21 +1,37 @@
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 
+import Test.Tasty
+import Test.Tasty.Hspec
+
 main :: IO ()
 main = do
-        text <- TIO.readFile "data/input3.txt"
-        lns <- pure $ T.lines text
-        strs <- pure $ map (T.unpack) lns
-        print $ solve3a 0 $ repeatList strs
-        print $ product $ map (\s -> solve3b s 0 (repeatList strs)) slopes
+    spc <- spec
+    tSpec <- testSpec "day3" spc
+    defaultMain (testGroup "Tests" [tSpec])
+
+spec :: IO (SpecWith ())
+spec = do
+    text <- TIO.readFile "data/input3.txt"
+    lns <- pure $ T.lines text
+    strs <- pure $ map T.unpack lns
+    return $ context "spec" $ do
+        describe "overall" $ do
+            it "passes 3a" $
+                (solve3a strs)
+                `shouldBe`
+                191
+            it "passes 3b" $
+                (solve3b strs)
+                `shouldBe`
+                1478615040
+
+solve3a :: [String] -> Integer
+solve3a = treesOnSlope (3, 1) 0 . repeatList
 
 
-solve3a :: Integer -> [String] -> Integer
-solve3a n [] = n
-solve3a trees lst | hitTree lst = solve3a (trees + 1) transposed
-                  | otherwise = solve3a trees transposed
-    where
-        transposed = overList 3 $ downList 1 lst
+solve3b :: [String] -> Integer
+solve3b strs = product $ map (\s -> treesOnSlope s 0 $ repeatList strs) slopes
 
 slopes :: [(Integer, Integer)]
 slopes = [
@@ -25,12 +41,12 @@ slopes = [
     (7, 1),
     (1, 2)]
 
-solve3b :: (Integer, Integer) -> Integer -> [String] -> Integer
-solve3b _ n [] = n
-solve3b (r, d) trees lst | hitTree lst = solve3b (r,d) (trees + 1) transposed
-                         | otherwise = solve3b (r, d) trees transposed
+treesOnSlope :: (Integer, Integer) -> Integer -> [String] -> Integer
+treesOnSlope _ n [] = n
+treesOnSlope (right, down) trees lst | hitTree lst = treesOnSlope (right, down) (trees + 1) transposed
+                                     | otherwise = treesOnSlope (right, down) trees transposed
     where
-        transposed = overList r $ downList d lst
+        transposed = overList right $ downList down lst
 
 hitTree :: [String] -> Bool
 hitTree [] = False
@@ -50,4 +66,4 @@ repeatList :: [String] -> [String]
 repeatList = map repeatString
 
 repeatString :: String -> String
-repeatString = foldr (\s acc -> s ++ acc) "" . repeat
+repeatString = foldr (++) "" . repeat
