@@ -3,7 +3,7 @@ import qualified Data.Text.IO as TIO
 
 -- Someone's library so that I can split lists easily
 import Data.List.Split (splitOn)
-
+import Control.Monad
 import Test.Tasty
 import Test.Tasty.Hspec
 
@@ -32,10 +32,13 @@ spec = do
 
 --Fixme: Provide some clarity to function compositions, or make some of them functions
 solve4a :: [String] -> Int
-solve4a = length . filter hasRequired . map (map fst) . map (map keyPairTuple) . map words . map unwords . splitOn [""]
+solve4a = length . filter hasRequired . map (map fst) . map (map keyPairTuple) . toEntryLists . splitOn [""]
 
 solve4b :: [String] -> Int
-solve4b = length . filter (all isValidEntry) . filter (\x -> hasRequired (map fst x)) . map (map keyPairTuple) . map words . map unwords . splitOn [""]
+solve4b = length . filter (all isValidEntry) . filter (hasRequired . map fst) . map (map keyPairTuple) . toEntryLists . splitOn [""]
+
+toEntryLists :: [[String]] -> [[String]]
+toEntryLists = map words . map unwords
 
 keyPairTuple :: String -> (String, String)
 keyPairTuple entry = (head splits, last splits)
@@ -43,31 +46,32 @@ keyPairTuple entry = (head splits, last splits)
         splits = splitOn ":" entry
 
 hasRequired :: [String] -> Bool
-hasRequired keys = all (`elem` keys) required
+hasRequired = flip all required . flip elem
     where
         required :: [String]
         required = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
 
 
 isValidEntry :: (String, String) -> Bool
-isValidEntry ("byr", yr) = (yNum >= 1920 && yNum <= 2002)
+isValidEntry ("byr", yr) = boundsCheck 1920 2002 $ yNum
     where yNum = read yr :: Int
-isValidEntry ("iyr", yr) = (yNum >= 2010 && yNum <= 2020)
+isValidEntry ("iyr", yr) = boundsCheck 2010 2020 $ yNum
     where yNum = read yr :: Int
-isValidEntry ("eyr", yr) = (yNum >= 2020 && yNum <= 2030)
+isValidEntry ("eyr", yr) = boundsCheck 2020 2030 $ yNum
     where yNum = read yr :: Int
 isValidEntry ("ecl", color) = color `elem` ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
 isValidEntry ("hgt", hgt) | last hgt == 'm' = processCm num
                           | last hgt == 'n' = processIn num
                           | otherwise = False
     where
-        num = read (init $ init hgt) :: Int
-        processCm n = (n >= 150 && n <= 193)
-        processIn n = (n >= 59 && n <= 76)
+        num = read $ init $ init hgt :: Int
+        processCm = boundsCheck 150 193
+        processIn = boundsCheck 59 76
 isValidEntry ("hcl", color) = length color == 7 && isColor (tail color)
-    where isColor c = all (\x -> (x `elem` ['0'..'9']) || (x `elem` ['a'..'f'])) c
+    where isColor = all (liftM2 (||) (`elem` ['0'..'9']) (`elem` ['a'..'f']))
 isValidEntry ("pid", num) = length num == 9 && all (`elem` ['0'..'9']) num
 isValidEntry ("cid", _) = True
 isValidEntry _ = False
 
-
+boundsCheck :: Int -> Int -> Int -> Bool
+boundsCheck lower upper = liftM2 (&&) (>= lower) (<= upper)
