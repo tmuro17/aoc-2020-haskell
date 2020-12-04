@@ -33,7 +33,7 @@ solve3a = treesOnSlope (3, 1) 0 . repeatList
 solve3b :: [String] -> Integer
 solve3b strs = product $ map (\s -> treesOnSlope s 0 $ repeatList strs) slopes
 
-slopes :: [(Integer, Integer)]
+slopes :: [(Int, Int)]
 slopes = [
     (1, 1),
     (3, 1),
@@ -41,30 +41,18 @@ slopes = [
     (7, 1),
     (1, 2)]
 
-treesOnSlope :: (Integer, Integer) -> Integer -> [String] -> Integer
+treesOnSlope :: (Int, Int) -> Integer -> [String] -> Integer
 treesOnSlope _ n [] = n
 treesOnSlope (right, down) trees lst | hitTree lst = treesOnSlope (right, down) (trees + 1) transposed
                                      | otherwise = treesOnSlope (right, down) trees transposed
     where
-        transposed = overList right $ downList down lst
+        transposed = map (drop right) $ drop down lst
 
 hitTree :: [String] -> Bool
 hitTree [] = False
 hitTree [[]] = False
 hitTree lst = (=='#') $ head $ head lst
 
-downList :: Integer -> [String] -> [String]
-downList _ [] = []
-downList 0 x = x
-downList n x = downList (n - 1) $ tail x
-
-overList :: Integer -> [String] -> [String]
-overList _ [] = []
-overList 0 x = x
-overList n x = overList (n - 1) $ map tail x
 
 repeatList :: [String] -> [String]
-repeatList = map repeatString
-
-repeatString :: String -> String
-repeatString = foldr (++) "" . repeat
+repeatList = map cycle
