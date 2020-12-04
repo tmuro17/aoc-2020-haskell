@@ -27,11 +27,11 @@ spec = do
                 1478615040
 
 solve3a :: [String] -> Integer
-solve3a = treesOnSlope (3, 1) 0 . repeatList
+solve3a = treesOnSlope (3, 1) 0 . map cycle
 
 
 solve3b :: [String] -> Integer
-solve3b strs = product $ map (\s -> treesOnSlope s 0 $ repeatList strs) slopes
+solve3b = product . flip map slopes . flip (flip treesOnSlope 0) . map cycle
 
 slopes :: [(Int, Int)]
 slopes = [
@@ -52,7 +52,3 @@ hitTree :: [String] -> Bool
 hitTree [] = False
 hitTree [[]] = False
 hitTree lst = (=='#') $ head $ head lst
-
-
-repeatList :: [String] -> [String]
-repeatList = map cycle
