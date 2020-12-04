@@ -6,48 +6,6 @@ name: day04
 synopsis: Advent of Code
 version: '0.0.1'
 
-default-extensions:
-  - AllowAmbiguousTypes
-  - ApplicativeDo
-  - BangPatterns
-  - BlockArguments
-  - DataKinds
-  - DeriveFoldable
-  - DeriveFunctor
-  - DeriveGeneric
-  - DeriveTraversable
-  - EmptyCase
-  - FlexibleContexts
-  - FlexibleInstances
-  - FunctionalDependencies
-  - GADTs
-  - GeneralizedNewtypeDeriving
-  - ImplicitParams
-  - KindSignatures
-  - LambdaCase
-  - MonadComprehensions
-  - MonoLocalBinds
-  - MultiParamTypeClasses
-  - MultiWayIf
-  - NegativeLiterals
-  - NumDecimals
-  - OverloadedLists
-  - PartialTypeSignatures
-  - PatternGuards
-  - PatternSynonyms
-  - PolyKinds
-  - RankNTypes
-  - RecordWildCards
-  - ScopedTypeVariables
-  - TemplateHaskell
-  - TransformListComp
-  - TupleSections
-  - TypeApplications
-  - TypeInType
-  - TypeOperators
-  - ViewPatterns
-
-
 executables:
   day04:
     main: day04.hs
@@ -59,3 +17,4 @@ executables:
       - containers
       - tasty
       - tasty-hspec
+      - split
