@@ -2,6 +2,8 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 
 import qualified Data.Map as M
+
+import Data.List.Split
 import Test.Tasty
 import Test.Tasty.Hspec
 
@@ -15,22 +17,26 @@ spec :: IO (SpecWith ())
 spec = do
     text <- TIO.readFile "data/input2.txt"
     lns <- pure $ T.lines text
+    strs <- pure $ map T.unpack lns
     return $ context "spec" $ do
         describe "overall" $ do
             it "passes 2a" $
-                (length $ filter (\[range, tc, pass] -> isValid (rangeToTuple range) (targetChar tc) (T.unpack pass)) $ map (T.words) lns)
+                solve2a strs
                 `shouldBe`
                 416
             it "passes 2b" $
-                (length $ filter (\[range, tc, pass] -> isValid' (rangeToTuple range) (targetChar tc) (T.unpack pass)) $ map (T.words) lns)
+                solve2b strs
                 `shouldBe`
                  688
+solve2a :: [String] -> Int
+solve2a = length . filter (\[range, tc, pass] -> isValid (rangeToTuple range) (head tc) pass) . map words
 
-rangeToTuple :: T.Text -> (Integer, Integer)
-rangeToTuple txt = (\[l, u] -> (read $ T.unpack l, read $ T.unpack u)) $ T.splitOn (T.pack "-") txt
+solve2b :: [String] -> Int
+solve2b = length . filter (\[range, tc, pass] -> isValid' (rangeToTuple range) (head tc) pass) . map words
 
-targetChar :: T.Text -> Char
-targetChar = head . T.unpack
+rangeToTuple :: String -> (Integer, Integer)
+rangeToTuple = (\[l, u] -> (read l, read u)) . splitOn "-"
+
 
 isValid :: (Integer, Integer) -> Char -> String -> Bool
 isValid (lBnd,uBnd) target pass = case M.lookup target $ M.fromListWith (+) [(c, 1) | c <- pass] of
