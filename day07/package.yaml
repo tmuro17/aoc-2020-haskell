@@ -1,0 +1,20 @@
+# This YAML file describes your package. Stack will automatically generate a
+# Cabal file when you run `stack build`. See the hpack website for help with
+# this file: <https://github.com/sol/hpack>.
+
+name: day07
+synopsis: Advent of Code
+version: '0.0.1'
+
+executables:
+  day07:
+    main: day07.hs
+    source-dirs: src
+    dependencies:
+      - base >= 2 && < 6
+      - text
+      - megaparsec
+      - containers
+      - tasty
+      - tasty-hspec
+      - split
