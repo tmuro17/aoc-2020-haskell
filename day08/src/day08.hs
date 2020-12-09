@@ -49,7 +49,6 @@ processInstructions ip instrs acc seen = case M.lookup ip instrs of
     Just (Instruction JMP addr) -> processInstructions (ip + addr) instrs acc (ip : seen)
 
 
-
 processInstructionsM :: Int -> InstrMap -> Int -> [Int] -> Maybe Int
 processInstructionsM ip _ _ seen | ip `elem` seen = Nothing
 processInstructionsM ip instrs acc seen = case M.lookup ip instrs of
