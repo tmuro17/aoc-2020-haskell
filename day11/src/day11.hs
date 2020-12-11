@@ -32,11 +32,11 @@ spec = do
                 1914
 
 solve11a :: [String] -> Int
-solve11a strs = length $ filter (== Filled) $ concat $ stepUntilStable $ toSeatingMap strs
+solve11a = length . filter (== Filled) . concat . stepUntilStable . toSeatingMap
 
 
 solve11b :: [String] -> Int
-solve11b strs = length $ filter (== Filled) $ concat $ stepUntilStableB $ toSeatingMap strs
+solve11b = length . filter (== Filled) . concat . stepUntilStableB . toSeatingMap
 
 toSeatingMap :: [String] -> SeatMap
 toSeatingMap = map (map toState)
@@ -63,7 +63,7 @@ stepMap orig (row, col) new | row >= maxRow = init new
         lookLoc :: SeatMap -> (Int, Int) -> Maybe State
         lookLoc seatMap (r, c) = (seatMap `atMay` r) >>= (`atMay` c)
         neighborStates :: [State]
-        neighborStates = catMaybes $ map (lookLoc orig) neighborLocations
+        neighborStates = mapMaybe (lookLoc orig) neighborLocations
         currentState = lookLoc orig (row, col)
         occupiedSeats = length $ filter (== Filled) neighborStates
 
@@ -74,10 +74,10 @@ stepUntilStable input | input == next = next
 
 stepMapB :: SeatMap -> (Int, Int) -> SeatMap -> SeatMap
 stepMapB orig (row, col) new | row >= maxRow = init new
-                               | col >= maxCol = stepMapB orig (succ row, 0) (new ++ [[]])
-                               | currentState == Just Empty && occupiedSeats == 0 = stepMapB orig (row, succ col) (init new ++ [last new ++ [Filled]])
-                               | currentState == Just Filled && occupiedSeats >= 5 = stepMapB orig (row, succ col) (init new ++ [last new ++ [Empty]])
-                               | otherwise = stepMapB orig (row, succ col) (init new ++ [last new ++ [fromJust currentState]])
+                             | col >= maxCol = stepMapB orig (succ row, 0) (new ++ [[]])
+                             | currentState == Just Empty && occupiedSeats == 0 = stepMapB orig (row, succ col) (init new ++ [last new ++ [Filled]])
+                             | currentState == Just Filled && occupiedSeats >= 5 = stepMapB orig (row, succ col) (init new ++ [last new ++ [Empty]])
+                             | otherwise = stepMapB orig (row, succ col) (init new ++ [last new ++ [fromJust currentState]])
     where
         maxRow = length orig
         maxCol = length $ head orig
@@ -93,11 +93,11 @@ stepMapB orig (row, col) new | row >= maxRow = init new
         lookLoc :: SeatMap -> (Int, Int) -> Maybe State
         lookLoc seatMap (r, c) = (seatMap `atMay` r) >>= (`atMay` c)
         neighborStates :: [State]
-        neighborStates = catMaybes $ map (lookDirection orig (row, col)) neighborDirections
+        neighborStates = mapMaybe (lookDirection orig (row, col)) neighborDirections
         currentState = lookLoc orig (row, col)
         occupiedSeats = length $ filter (== Filled) neighborStates
 
 stepUntilStableB :: SeatMap -> SeatMap
 stepUntilStableB input | input == next = next
-                         | otherwise = stepUntilStableB next
+                       | otherwise = stepUntilStableB next
     where next = stepMapB input (0,0) [[]]
