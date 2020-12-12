@@ -5,14 +5,7 @@ import Test.Tasty
 import Test.Tasty.Hspec
 
 data Direction = North | East | South | West deriving (Show, Eq, Ord)
-data Movement = N Int
-              | S Int
-              | W Int
-              | E Int
-              | F Int
-              | L Int
-              | R Int
-              deriving (Show, Eq, Ord)
+data Movement = N Int | S Int | W Int | E Int | F Int | L Int | R Int deriving (Show, Eq, Ord)
 
 
 main :: IO ()
@@ -39,8 +32,8 @@ spec = do
 
 
 solve12a :: [String] -> Int
-solve12a strs = manhattan (0, 0) (moveShip (0,0, East) moves)
-    where moves = map toMovement strs
+solve12a = manhattan (0, 0) . moveShip (0, 0, East) . map toMovement
+--solve12a strs = manhattan (0, 0) (moveShip (0,0, East) (map toMovement strs))
 
 toMovement :: String -> Movement
 toMovement ('N':xs) = N (read xs)
@@ -56,17 +49,20 @@ turn :: Movement -> Direction -> Direction
 turn (L num) dir | num == 0 = dir
                  | num < 90 = error "bad degree"
                  | otherwise = turn (L (num - 90)) (left dir)
-    where left dir | dir == North = West
-                   | dir == West = South
-                   | dir == South = East
-                   | dir == East = North
+    where left d | d == North = West
+                 | d == West = South
+                 | d == South = East
+                 | d == East = North
+                 | otherwise = error "bad direction"
 turn (R num) dir | num == 0 = dir
                  | num < 90 = error "bad degree"
                  | otherwise = turn (R (num - 90)) (right dir)
-    where right dir | dir == North = East
-                    | dir == East = South
-                    | dir == South = West
-                    | dir == West = North
+   where right d | d == North = East
+                 | d == East = South
+                 | d == South = West
+                 | d == West = North
+                 | otherwise = error "bad direction"
+turn _ _ = error "bad turn"
 
 moveShip :: (Int, Int, Direction) -> [Movement] -> (Int, Int)
 moveShip (north, east, _) [] = (north, east)
@@ -78,16 +74,18 @@ moveShip (north, east, dir) ((F num) : rst) | dir == North = moveShip (north + n
                                             | dir == South = moveShip (north - num, east, dir) rst
                                             | dir == East = moveShip (north, east + num, dir) rst
                                             | dir == West = moveShip (north, east - num, dir) rst
+                                            | otherwise = error "bad direction"
 moveShip (north, east, dir) ((R deg) : rst) = moveShip (north, east, turn (R deg) dir) rst
 moveShip (north, east, dir) ((L deg) : rst) = moveShip (north, east, turn (L deg) dir) rst
 
 manhattan :: (Int, Int) -> (Int, Int) -> Int
 manhattan (w, x) (y, z) = abs (w - y) + abs (x - z)
-
+--The monster this could be, like, if you wanted to hate everything
+--manhattan = uncurry (flip flip snd . (ap .) . flip flip fst . ((.) .) . (. ((abs .) . (-))) . flip . (((.) . (+) . abs) .) . (-))
 
 solve12b :: [String] -> Int
-solve12b strs = manhattan (0, 0) (moveShipB (0,0) (1, 10) moves)
-    where moves = map toMovement strs
+solve12b = manhattan (0, 0) . moveShipB (0, 0) (1, 10) . map toMovement
+--solve12b strs = manhattan (0, 0) (moveShipB (0,0) (1, 10) (map toMovement strs))
 
 moveShipB :: (Int, Int) -> (Int, Int) -> [Movement] -> (Int, Int)
 moveShipB (sNorth, sEast) _ [] = (sNorth, sEast)
